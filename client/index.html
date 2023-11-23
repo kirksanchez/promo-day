@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PROMO DAY</title>
+  <style>
+    /* Add your CSS styling here */
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    .container {
+      width: 20%;
+      margin: auto;
+    }
+
+    label,
+    button {
+      margin-top: 10px;
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>PROMO DAY</h1>
+    <form id="purchase-form">
+      <label for="product-select">Select Product:</label>
+      <select id="product-select" name="product">
+        <option value="1">One-way ticket - 5000 PHP</option>
+        <option value="2">Round trip ticket - 10000 PHP</option>
+        <option value="3">Half year unli Travel subscription - 50000 PHP</option>
+        <option value="4">Full year unli Travel subscription - 100000 PHP</option>
+      </select>
+
+      <label for="quantity">Quantity:</label>
+      <input type="number" id="quantity" name="quantity" min="1" value="1">
+
+      <label for="promo-code-select">Promo Code (optional):</label>
+      <select id="promo-code-select" name="promoCode">
+        <option value="">No Promo Code</option>
+        <option value="FREETWOWAY">FREETWOWAY - Adds a free round trip ticket</option>
+        <option value="5OFF">5OFF - 5% discount on the total amount</option>
+      </select>
+
+      <button type="submit">Submit Purchase</button>
+    </form>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    // Add your JavaScript here
+    document.getElementById('purchase-form').addEventListener('submit', function (event) {
+      event.preventDefault();
+
+      const productSelect = document.getElementById('product-select');
+      const quantityInput = document.getElementById('quantity');
+      const promoCodeSelect = document.getElementById('promo-code-select');
+      const resultDiv = document.getElementById('result');
+
+      const purchaseData = {
+        cart: [{
+          productId: parseInt(productSelect.value),
+          quantity: parseInt(quantityInput.value)
+        }],
+        promoCode: promoCodeSelect.value // Use the selected promo code value
+      };
+
+      // Simple fetch POST request to your backend
+      fetch('http://localhost:3000/purchase', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(purchaseData)
+      })
+        .then(response => response.json())
+        .then(data => {
+          let resultHTML = `<p>Total cost: ${data.total} PHP</p>`;
+          if (data.promoMessage) {
+            resultHTML += `<p>${data.promoMessage}</p>`; // Display the promo message if available
+          }
+          resultDiv.innerHTML = resultHTML;
+        })
+        .catch(error => {
+          resultDiv.innerHTML = `<p>Error: ${error.message}</p>`;
+        });
+    });
+  </script>
+</body>
+
+</html>
